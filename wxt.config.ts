@@ -9,5 +9,10 @@ export default defineConfig({
 			48: "icon/icon48.png",
 			128: "icon/icon128.png",
 		},
+		permissions: [
+			"storage",
+			"tabs",
+			"activeTab"
+		],
 	},
 });
