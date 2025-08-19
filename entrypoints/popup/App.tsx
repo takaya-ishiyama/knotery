@@ -1,73 +1,19 @@
-import { createEffect, createSignal, For } from "solid-js";
-import { PageStorage, type SavedPage } from "../../utils/storage";
+import { createSignal, For } from "solid-js";
+import { type SavedPage } from "../../utils/storage";
 import "./App.css";
-import { saveToStorage } from "../hooks/saveToStorage";
-import { showNotification } from "../hooks/notification";
+import { getStorageData } from "./hooks/getStorageData";
+import { usePopupHandler } from "./hooks/usePopupHandler";
 
 function App() {
-  const [savedPages, setSavedPages] = createSignal<SavedPage[]>([]);
-  const [isLoading, setIsLoading] = createSignal(true);
+  const [data, { refetch }] = createResource<SavedPage[]>(getStorageData);
   const [currentTab, setCurrentTab] = createSignal<"list" | "current">("list");
 
-  createEffect(async () => {
-    try {
-      const pages = await PageStorage.getAllPages();
-      setSavedPages(pages);
-    } catch (error) {
-      console.error("Failed to load saved pages:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  });
-
-  const saveCurrentPage = async () => {
-    try {
-      const [tab] = await browser.tabs.query({
-        active: true,
-        currentWindow: true,
-      });
-      if (tab.title && tab.url) {
-        const savedPage = await saveToStorage({
-          title: tab.title,
-          url: tab.url,
-        });
-        setSavedPages([...savedPages(), savedPage]);
-      }
-      // 成功メッセージを表示
-      showNotification("ページが保存されました！", "success");
-    } catch (error) {
-      console.error("Failed to save current page:", error);
-      showNotification("保存に失敗しました", "error");
-    }
-  };
-
-  const deletePage = async (id: string) => {
-    try {
-      await PageStorage.deletePage(id);
-      setSavedPages(savedPages().filter((page) => page.id !== id));
-    } catch (error) {
-      console.error("Failed to delete page:", error);
-    }
-  };
-
-  const exportJSON = async () => {
-    try {
-      await PageStorage.downloadJSON();
-    } catch (error) {
-      console.error("Failed to export JSON:", error);
-    }
-  };
-
-  const clearAllPages = async () => {
-    if (confirm("すべての保存ページを削除しますか？")) {
-      try {
-        await PageStorage.clearAllPages();
-        setSavedPages([]);
-      } catch (error) {
-        console.error("Failed to clear all pages:", error);
-      }
-    }
-  };
+  const { saveCurrentPage, deletePage, clearAllPages, exportJSON } =
+    usePopupHandler({
+      refetch: async () => {
+        refetch();
+      },
+    });
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString("ja-JP");
@@ -139,17 +85,17 @@ function App() {
             </button>
           </div>
 
-          {isLoading()
-            ? <div>読み込み中...</div>
-            : savedPages().length === 0
-            ? (
-              <div style="text-align: center; color: #666; padding: 20px;">
-                保存されたページがありません
-              </div>
-            )
-            : (
+          <Suspense fallback={<div>読み込み中...</div>}>
+            <Show
+              when={(data()?.length ?? 0) > 0}
+              fallback={
+                <div style="text-align: center; color: #666; padding: 20px;">
+                  保存されたページがありません
+                </div>
+              }
+            >
               <div style="max-height: 300px; overflow-y: auto;">
-                <For each={savedPages()}>
+                <For each={data()}>
                   {(page) => (
                     <div style="
                     border: 1px solid #eee;
@@ -201,7 +147,8 @@ function App() {
                   )}
                 </For>
               </div>
-            )}
+            </Show>
+          </Suspense>
         </div>
       )}
 
