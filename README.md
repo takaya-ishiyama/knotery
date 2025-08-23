@@ -1,4 +1,3 @@
 # knotery
-## WXT + SolidJS
 
-This template should help get you started developing with SolidJS in WXT.
+サイトのタイトルやURLを保存する拡張機能
