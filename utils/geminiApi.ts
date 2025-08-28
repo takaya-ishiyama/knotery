@@ -1,4 +1,6 @@
+import { google } from "@ai-sdk/google";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { generateText } from "ai";
 
 const GEMINI_API_KEY_STORAGE = "gemini-api-key";
 
@@ -13,7 +15,7 @@ export interface SummaryResult {
 export class GeminiService {
   private genAI: GoogleGenerativeAI | null = null;
 
-  async initialize(): Promise<boolean> {
+  private async initialize(): Promise<boolean> {
     const result = await browser.storage.local.get(GEMINI_API_KEY_STORAGE);
     const apiKey = result[GEMINI_API_KEY_STORAGE];
     if (!apiKey) {
@@ -38,7 +40,7 @@ export class GeminiService {
     }
 
     try {
-      const model = this.genAI!.getGenerativeModel({ model: "gemini-pro" });
+      const model = google("gemini-2.5-flash");
 
       const prompt =
         `以下のWebページの内容を日本語で簡潔に要約してください。重要なポイントを箇条書きでまとめ、最後に一段落の要約を追加してください。
@@ -51,15 +53,24 @@ ${content}
 
 要約:`;
 
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const summary = response.text();
+      const { text, reasoning } = await generateText({
+        model,
+        prompt,
+        providerOptions: {
+          google: {
+            thinkingConfig: {
+              thinkingBudget: 8192,
+              includeThoughts: true,
+            },
+          },
+        },
+      });
 
       const summaryResult: SummaryResult = {
         id: `summary-${Date.now()}`,
         url,
         title,
-        summary,
+        summary: text,
         createdAt: Date.now(),
       };
 
