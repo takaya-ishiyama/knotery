@@ -1,5 +1,9 @@
 import { createResource } from "solid-js";
-import type { SummaryResult } from "../../../utils/geminiApi";
+import {
+  geminiInitialize,
+  summarizeContent,
+  type SummaryResult,
+} from "../../../utils/geminiApi";
 import { summaryStorage } from "../../../utils/summaryStorage";
 
 export const useSummaries = () => {
@@ -10,6 +14,7 @@ export const useSummaries = () => {
   );
 
   const summarizeCurrentPage = async () => {
+    alert("要約の作成を開始します。しばらくお待ちください。");
     try {
       // 現在のタブを取得
       const [tab] = await browser.tabs.query({
@@ -25,22 +30,33 @@ export const useSummaries = () => {
 
       if (response && response.content) {
         // バックグラウンドスクリプトに要約リクエストを送信
-        const result = await browser.runtime.sendMessage({
-          type: "SUMMARIZE_CURRENT_PAGE",
-          data: {
-            content: response.content,
-            url: tab.url,
-            title: tab.title || "無題",
-          },
+        // 直列でやってもユーザー体験変わらなそうなので
+        // const result = await browser.runtime.sendMessage({
+        //   type: "SUMMARIZE_CURRENT_PAGE",
+        //   data: {
+        //     content: response.content,
+        //     url: tab.url,
+        //     title: tab.title || "無題",
+        //   },
+        //   refetch,
+        // });
+        //
+        // return result;
+
+        const instance = await geminiInitialize();
+        const summary = await summarizeContent(instance)({
+          url: tab.url,
+          title: tab.title ?? "",
         });
 
-        if (result.success) {
+        if (summary) {
+          await summaryStorage.saveSummary(summary);
           await refetch();
-          return { success: true, message: "要約を作成しました" };
+          return { success: true, message: "🎉要約の作成が完了しました🎉" };
         } else {
           return {
             success: false,
-            message: result.error || "要約の作成に失敗しました",
+            message: "要約の作成に失敗しました",
           };
         }
       } else {
@@ -48,6 +64,7 @@ export const useSummaries = () => {
       }
     } catch (error) {
       console.error("Error in summarizeCurrentPage:", error);
+      alert((error as Error).message);
       return { success: false, message: "エラーが発生しました" };
     }
   };
@@ -71,4 +88,3 @@ export const useSummaries = () => {
     clearAllSummaries,
   };
 };
-

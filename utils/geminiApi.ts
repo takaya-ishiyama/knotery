@@ -1,85 +1,75 @@
-import { google } from "@ai-sdk/google";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import { generateText } from "ai";
+import { GoogleGenAI } from "@google/genai";
 
 const GEMINI_API_KEY_STORAGE = "gemini-api-key";
 
-export interface SummaryResult {
+const GEMINI_MODEL = "gemini-2.5-flash-lite";
+
+const decryptApiKey = (encryptedKey: string): string => {
+  return atob(encryptedKey);
+};
+
+export type SummaryResult = {
   id: string;
   url: string;
   title: string;
   summary: string;
   createdAt: number;
-}
+};
 
-export class GeminiService {
-  private genAI: GoogleGenerativeAI | null = null;
+export const geminiInitialize = async (): Promise<GoogleGenAI> => {
+  const result = await browser.storage.local.get(GEMINI_API_KEY_STORAGE);
+  const apiKey = result[GEMINI_API_KEY_STORAGE];
 
-  private async initialize(): Promise<boolean> {
-    const result = await browser.storage.local.get(GEMINI_API_KEY_STORAGE);
-    const apiKey = result[GEMINI_API_KEY_STORAGE];
-    if (!apiKey) {
-      console.error("Gemini API key not found");
-      return false;
-    }
-
-    this.genAI = new GoogleGenerativeAI(apiKey);
-    return true;
+  if (!apiKey) {
+    throw new Error("Gemini API key not found");
   }
 
-  async summarizeContent(
-    content: string,
-    url: string,
-    title: string,
-  ): Promise<SummaryResult | null> {
-    if (!this.genAI) {
-      const initialized = await this.initialize();
-      if (!initialized) {
-        return null;
-      }
-    }
+  const decryptedKey = decryptApiKey(result[GEMINI_API_KEY_STORAGE]);
 
-    try {
-      const model = google("gemini-2.5-flash");
+  return new GoogleGenAI({ apiKey: decryptedKey });
+};
 
-      const prompt =
-        `以下のWebページの内容を日本語で簡潔に要約してください。重要なポイントを箇条書きでまとめ、最後に一段落の要約を追加してください。
-
-タイトル: ${title}
-URL: ${url}
-
-内容:
-${content}
-
-要約:`;
-
-      const { text, reasoning } = await generateText({
-        model,
-        prompt,
-        providerOptions: {
-          google: {
-            thinkingConfig: {
-              thinkingBudget: 8192,
-              includeThoughts: true,
-            },
-          },
-        },
-      });
-
-      const summaryResult: SummaryResult = {
-        id: `summary-${Date.now()}`,
-        url,
-        title,
-        summary: text,
-        createdAt: Date.now(),
-      };
-
-      return summaryResult;
-    } catch (error) {
-      console.error("Failed to generate summary:", error);
-      return null;
-    }
+export const summarizeContent = (ai: GoogleGenAI) =>
+async (
+  { url, title }: {
+    url: string;
+    title: string;
+  },
+): Promise<SummaryResult | undefined> => {
+  if (!ai) {
+    throw new Error("Gemini instance is not initialized");
   }
-}
+  try {
+    // Google AI プロバイダーインスタンスを作成
 
-export const geminiService = new GeminiService();
+    const prompt =
+      `指定されたurlのWebページの内容を日本語で簡潔に要約してください。重要なポイントを箇条書きでまとめ、最後に一段落の要約を追加してください。
+URL: ${url}`;
+
+    const { text } = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents: prompt,
+      config: {
+        tools: [
+          // 検索ツールと URL Context ツールの両方を使う
+          { urlContext: {} },
+          { googleSearch: {} },
+        ],
+      },
+    });
+
+    const summaryResult: SummaryResult = {
+      id: `summary-${Date.now()}`,
+      url,
+      title: title,
+      summary: text ?? "",
+      createdAt: Date.now(),
+    };
+
+    return summaryResult;
+  } catch (error) {
+    alert((error as Error).message);
+    console.error("Failed to generate summary:", error);
+    return undefined;
+  }
+};

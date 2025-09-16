@@ -21,8 +21,8 @@ function App() {
 
   const { apiKey, setApiKey, status, isLoading, saveApiKey } =
     useGeminiApiKey();
-  // const { summaries, summarizeCurrentPage, deleteSummary, clearAllSummaries } =
-  useSummaries();
+  const { summaries, summarizeCurrentPage, deleteSummary, clearAllSummaries } =
+    useSummaries();
 
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleString("ja-JP");
@@ -213,9 +213,7 @@ function App() {
         </div>
       )}
 
-      {
-        /**
-        {currentTab() === "summaries" && (
+      {currentTab() === "summaries" && (
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <h2 style="margin: 0; font-size: 16px;">ページ要約</h2>
@@ -312,8 +310,6 @@ function App() {
           </Suspense>
         </div>
       )}
-      */
-      }
 
       {currentTab() === "settings" && (
         <div>
