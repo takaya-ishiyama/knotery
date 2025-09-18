@@ -12,6 +12,12 @@ export default defineContentScript({
         };
         sendResponse(pageInfo);
       }
+      
+      if (message.type === "GET_PAGE_CONTENT") {
+        // ページのメインコンテンツを取得
+        const content = document.body?.innerText || "";
+        sendResponse({ content });
+      }
     });
   },
 });
