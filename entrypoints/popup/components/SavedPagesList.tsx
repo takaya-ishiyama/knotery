@@ -6,6 +6,7 @@ interface SavedPagesListProps {
 	onDelete: (id: string) => void;
 	onClearAll: () => void;
 	onExport: () => void;
+	onSaveCurrentPage: () => void;
 }
 
 export function SavedPagesList(props: SavedPagesListProps) {
@@ -16,6 +17,21 @@ export function SavedPagesList(props: SavedPagesListProps) {
 	return (
 		<div>
 			<div style={{ display: "flex", gap: "8px", "margin-bottom": "16px" }}>
+				<button
+					type="button"
+					onClick={props.onSaveCurrentPage}
+					style={{
+						padding: "6px 12px",
+						background: "#007acc",
+						color: "white",
+						border: "none",
+						"border-radius": "4px",
+						cursor: "pointer",
+						"font-size": "12px",
+					}}
+				>
+					📌 現在のページを保存
+				</button>
 				<button
 					type="button"
 					onClick={props.onExport}

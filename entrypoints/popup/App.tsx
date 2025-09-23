@@ -1,7 +1,6 @@
 import { Show, createResource, createSignal } from "solid-js";
 import type { SavedPage } from "../../utils/storage";
 import "./App.css";
-import { CurrentPageTab } from "./components/CurrentPageTab";
 import { SavedPagesList } from "./components/SavedPagesList";
 import { SettingsTab } from "./components/SettingsTab";
 import { SummariesTab } from "./components/SummariesTab";
@@ -14,7 +13,7 @@ import { useSummaries } from "./hooks/useSummaries";
 function App() {
 	const [data, { refetch }] = createResource<SavedPage[]>(getStorageData);
 	const [currentTab, setCurrentTab] = createSignal<
-		"list" | "current" | "summaries" | "settings"
+		"list" | "summaries" | "settings"
 	>("list");
 
 	const { saveCurrentPage, deletePage, clearAllPages, exportJSON } =
@@ -38,13 +37,7 @@ function App() {
 					active={currentTab() === "list"}
 					onClick={() => setCurrentTab("list")}
 				>
-					保存済み
-				</TabButton>
-				<TabButton
-					active={currentTab() === "current"}
-					onClick={() => setCurrentTab("current")}
-				>
-					現在のページ
+					保存ページ
 				</TabButton>
 				<TabButton
 					active={currentTab() === "summaries"}
@@ -66,11 +59,8 @@ function App() {
 					onDelete={deletePage}
 					onClearAll={clearAllPages}
 					onExport={exportJSON}
+					onSaveCurrentPage={saveCurrentPage}
 				/>
-			</Show>
-
-			<Show when={currentTab() === "current"}>
-				<CurrentPageTab onSaveCurrentPage={saveCurrentPage} />
 			</Show>
 
 			<Show when={currentTab() === "summaries"}>
