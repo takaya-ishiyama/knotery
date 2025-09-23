@@ -1,14 +1,16 @@
+import type { SummaryResult } from "@/utils/geminiApi";
 import { For, Show, Suspense } from "solid-js";
-import type { Summary } from "../hooks/useSummaries";
 
-interface SummariesTabProps {
-	summaries: Summary[] | undefined;
-	onSummarizeCurrent: () => Promise<{ success: boolean; message: string } | undefined>;
+type SummariesTabProps = {
+	summaries: SummaryResult[] | undefined;
+	onSummarizeCurrent: () => Promise<
+		{ success: boolean; message: string } | undefined
+	>;
 	onDelete: (id: string) => void;
 	onClearAll: () => void;
-}
+};
 
-export function SummariesTab(props: SummariesTabProps) {
+export const SummariesTab = (props: SummariesTabProps) => {
 	const formatDate = (timestamp: number) => {
 		return new Date(timestamp).toLocaleString("ja-JP");
 	};
@@ -100,15 +102,22 @@ export function SummariesTab(props: SummariesTabProps) {
 									>
 										{summary.title}
 									</div>
-									<div
-										style={{
-											"font-size": "12px",
-											color: "#666",
-											"margin-bottom": "8px",
-										}}
+									<a
+										href={summary.url}
+										target="_blank"
+										rel="noopener noreferrer"
 									>
-										{summary.url}
-									</div>
+										<div
+											style={{
+												"font-size": "12px",
+												color: "#666",
+												"margin-bottom": "8px",
+											}}
+										>
+											{summary.url}
+										</div>
+									</a>
+
 									<div
 										style={{
 											"font-size": "12px",
@@ -153,4 +162,4 @@ export function SummariesTab(props: SummariesTabProps) {
 			</Suspense>
 		</div>
 	);
-}
+};

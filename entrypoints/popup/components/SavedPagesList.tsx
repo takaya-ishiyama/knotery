@@ -1,15 +1,15 @@
 import { For, Show, Suspense } from "solid-js";
 import type { SavedPage } from "../../../utils/storage";
 
-interface SavedPagesListProps {
+type SavedPagesListProps = {
 	data: SavedPage[] | undefined;
 	onDelete: (id: string) => void;
 	onClearAll: () => void;
 	onExport: () => void;
 	onSaveCurrentPage: () => void;
-}
+};
 
-export function SavedPagesList(props: SavedPagesListProps) {
+export const SavedPagesList = (props: SavedPagesListProps) => {
 	const formatDate = (timestamp: number) => {
 		return new Date(timestamp).toLocaleString("ja-JP");
 	};
@@ -100,15 +100,18 @@ export function SavedPagesList(props: SavedPagesListProps) {
 									>
 										{page.title}
 									</div>
-									<div
-										style={{
-											"font-size": "12px",
-											color: "#666",
-											"margin-bottom": "4px",
-										}}
-									>
-										{page.url}
-									</div>
+									<a href={page.url} target="_blank" rel="noopener noreferrer">
+										<div
+											style={{
+												"font-size": "12px",
+												color: "#666",
+												"margin-bottom": "4px",
+											}}
+										>
+											{page.url}
+										</div>
+									</a>
+
 									<div
 										style={{
 											"font-size": "11px",
@@ -158,4 +161,4 @@ export function SavedPagesList(props: SavedPagesListProps) {
 			</Suspense>
 		</div>
 	);
-}
+};

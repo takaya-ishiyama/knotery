@@ -48,3 +48,10 @@ knoteryはWXT + SolidJSを使用したブラウザ拡張機能です。WXTはク
 - 開発時は`.wxt/`ディレクトリが自動生成される
 - マニフェストファイルは自動生成されるため手動編集不要
 - Chrome/Firefox間の差異はWXTが自動処理
+- typescriptの型安全を遵守すること
+- any/uknownは使用しないこと
+- 型アサーションはしないこと
+- interfaceは使わずにtypeを使うこと
+- nullは使用せずundefinedを使用すること
+- classは極力使用せず関数にすること
+- 関数は極力無名関数を変数にセットして使用すること

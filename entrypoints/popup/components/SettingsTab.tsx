@@ -1,12 +1,12 @@
-interface SettingsTabProps {
+type SettingsTabProps = {
 	apiKey: () => string;
 	setApiKey: (key: string) => void;
 	status: () => string;
 	isLoading: () => boolean;
 	onSaveApiKey: () => void;
-}
+};
 
-export function SettingsTab(props: SettingsTabProps) {
+export const SettingsTab = (props: SettingsTabProps) => {
 	return (
 		<div>
 			<h2 style={{ margin: "0 0 16px 0", "font-size": "16px" }}>API設定</h2>
@@ -74,4 +74,4 @@ export function SettingsTab(props: SettingsTabProps) {
 			</div>
 		</div>
 	);
-}
+};

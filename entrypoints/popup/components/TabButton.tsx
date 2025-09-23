@@ -1,12 +1,12 @@
 import type { JSX } from "solid-js";
 
-interface TabButtonProps {
+type TabButtonProps = {
 	active: boolean;
 	onClick: () => void;
 	children: JSX.Element;
-}
+};
 
-export function TabButton(props: TabButtonProps) {
+export const TabButton = (props: TabButtonProps) => {
 	return (
 		<button
 			type="button"
@@ -23,4 +23,4 @@ export function TabButton(props: TabButtonProps) {
 			{props.children}
 		</button>
 	);
-}
+};
