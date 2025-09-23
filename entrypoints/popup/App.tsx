@@ -20,7 +20,7 @@ function App() {
 	const { saveCurrentPage, deletePage, clearAllPages, exportJSON } =
 		usePopupHandler({
 			refetch: async () => {
-				refetch();
+				await refetch();
 			},
 		});
 
