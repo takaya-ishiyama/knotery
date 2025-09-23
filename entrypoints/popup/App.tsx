@@ -34,6 +34,7 @@ function App() {
 
 			<div style="display: flex; gap: 8px; margin-bottom: 16px;">
 				<button
+					type="button"
 					onClick={() => setCurrentTab("list")}
 					style={`
             padding: 8px 16px;
@@ -47,6 +48,7 @@ function App() {
 					保存済み
 				</button>
 				<button
+					type="button"
 					onClick={() => setCurrentTab("current")}
 					style={`
             padding: 8px 16px;
@@ -60,6 +62,7 @@ function App() {
 					現在のページ
 				</button>
 				<button
+					type="button"
 					onClick={() => setCurrentTab("summaries")}
 					style={`
             padding: 8px 16px;
@@ -73,6 +76,7 @@ function App() {
 					要約
 				</button>
 				<button
+					type="button"
 					onClick={() => setCurrentTab("settings")}
 					style={`
             padding: 8px 16px;
@@ -91,6 +95,7 @@ function App() {
 				<div>
 					<div style="display: flex; gap: 8px; margin-bottom: 16px;">
 						<button
+							type="button"
 							onClick={exportJSON}
 							style="
                 padding: 6px 12px;
@@ -105,6 +110,7 @@ function App() {
 							JSON出力
 						</button>
 						<button
+							type="button"
 							onClick={clearAllPages}
 							style="
                 padding: 6px 12px;
@@ -152,6 +158,7 @@ function App() {
 											</div>
 											<div style="display: flex; gap: 8px;">
 												<button
+													type="button"
 													onClick={() => browser.tabs.create({ url: page.url })}
 													style="
                           padding: 4px 8px;
@@ -166,6 +173,7 @@ function App() {
 													開く
 												</button>
 												<button
+													type="button"
 													onClick={() => deletePage(page.id)}
 													style="
                           padding: 4px 8px;
@@ -193,6 +201,7 @@ function App() {
 				<div>
 					<div style="margin-bottom: 16px;">
 						<button
+							type="button"
 							onClick={saveCurrentPage}
 							style="
                 width: 100%;
@@ -220,6 +229,7 @@ function App() {
 					<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
 						<h2 style="margin: 0; font-size: 16px;">ページ要約</h2>
 						<button
+							type="button"
 							onClick={async () => {
 								const result = await summarizeCurrentPage();
 								if (result) {
@@ -242,6 +252,7 @@ function App() {
 
 					<div style="display: flex; gap: 8px; margin-bottom: 16px;">
 						<button
+							type="button"
 							onClick={clearAllSummaries}
 							style="
                 padding: 6px 12px;
@@ -292,6 +303,7 @@ function App() {
 													{formatDate(summary.createdAt)}
 												</div>
 												<button
+													type="button"
 													onClick={() => deleteSummary(summary.id)}
 													style="
                             padding: 4px 8px;
@@ -319,10 +331,14 @@ function App() {
 				<div>
 					<h2 style="margin: 0 0 16px 0; font-size: 16px;">API設定</h2>
 					<div style="margin-bottom: 16px;">
-						<label style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: bold;">
+						<label
+							for="gemini-api-key"
+							style="display: block; margin-bottom: 8px; font-size: 14px; font-weight: bold;"
+						>
 							Gemini API キー
 						</label>
 						<input
+							id="gemini-api-key"
 							type="password"
 							value={apiKey()}
 							onInput={(e) => setApiKey(e.currentTarget.value)}
@@ -340,6 +356,7 @@ function App() {
 						</div>
 					</div>
 					<button
+						type="button"
 						onClick={saveApiKey}
 						disabled={isLoading()}
 						style="
